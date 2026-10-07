@@ -1,0 +1,3 @@
+# The repository is written with LF endings, and a Windows checkout keeps them,
+# so that a test reads the same bytes on every runner.
+* text=auto eol=lf
