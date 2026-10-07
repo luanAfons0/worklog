@@ -1,6 +1,7 @@
 /**
- * The one test seam for the Plugin Server: the real `mcp`, spawned against a
- * temporary Plugin directory, spoken to exactly as the Host speaks to it.
+ * The one test seam for the Plugin Server: the real `mcp.ts`, run by the
+ * running Node with no shell, as the Host runs it (FirstMate ADR-0028), against
+ * a temporary Plugin directory, spoken to exactly as the Host speaks to it.
  *
  * Nothing here imports a module of the Plugin. What a test may see is what the
  * Host may see: the JSON-RPC lines on stdout, the diagnostics on stderr, the
@@ -22,8 +23,11 @@ import type { TestContext } from 'node:test';
 const TESTS = dirname(dirname(fileURLToPath(import.meta.url)));
 const REPOSITORY = dirname(TESTS);
 
-/** The `mcp` executable the Host would run. Tests run the same file. */
-export const EXECUTABLE = join(REPOSITORY, 'mcp');
+/** The `mcp.ts` entry point the Host runs with its own Node, on every system. */
+export const ENTRY = join(REPOSITORY, 'mcp.ts');
+
+/** The `sh` wrapper `mcp`, which the Host runs only in a `wsl` Place. */
+export const WRAPPER = join(REPOSITORY, 'mcp');
 
 /** The protocol version the Host sends in its handshake. */
 export const PROTOCOL_VERSION = '2025-06-18';
@@ -45,6 +49,8 @@ export type StartOptions = {
    * test that restarts the Plugin Server passes the directory of the first.
    */
   readonly directory?: string;
+  /** Start the `sh` wrapper `mcp` instead, as the Host does in a `wsl` Place. */
+  readonly wrapper?: boolean;
 };
 
 export type Ending = { readonly code: number | null; readonly signal: NodeJS.Signals | null };
@@ -72,10 +78,19 @@ export type Started = {
   stop(): void;
 };
 
+/** What stops each Plugin Server a test started, so its directory can go last. */
+const stoppers = new WeakMap<TestContext, Set<() => Promise<void>>>();
+
 /** A temporary Plugin directory for one test, removed when the test ends. */
 export async function makeDirectory(t: TestContext): Promise<string> {
   const directory = await mkdtemp(join(tmpdir(), 'worklog-test-'));
-  t.after(() => rm(directory, { recursive: true, force: true }));
+  t.after(async () => {
+    // Windows will not remove a directory a running process holds as its
+    // working directory, and `t.after` runs in the order it was given. So the
+    // directory stops every Plugin Server of the test before it goes.
+    await Promise.all([...(stoppers.get(t) ?? [])].map((stop) => stop()));
+    await rm(directory, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
+  });
   return directory;
 }
 
@@ -89,7 +104,9 @@ export async function startPluginServer(
 ): Promise<Started> {
   const directory = options.directory ?? (await makeDirectory(t));
 
-  const child = spawn(EXECUTABLE, [], {
+  const [program, args] =
+    options.wrapper === true ? [WRAPPER, []] : [process.execPath, [ENTRY]];
+  const child = spawn(program, args, {
     cwd: directory,
     env: { ...process.env, ...options.env },
     stdio: ['pipe', 'pipe', 'pipe'],
@@ -149,11 +166,13 @@ export async function startPluginServer(
     answered(message as Answer);
   }
 
-  t.after(async () => {
+  const shutDown = async (): Promise<void> => {
     child.stdin!.end();
     child.kill('SIGTERM');
     if (ending === null) await ended;
-  });
+  };
+  stoppers.set(t, (stoppers.get(t) ?? new Set()).add(shutDown));
+  t.after(shutDown);
 
   function askFor(method: string, params?: unknown): Promise<Answer> {
     const id = `test-${(counter += 1)}`;

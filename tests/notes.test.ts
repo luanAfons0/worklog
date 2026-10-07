@@ -3,12 +3,10 @@
  * Status and no Cycle.
  */
 import { strict as assert } from 'node:assert';
-import { mkdtemp, rm } from 'node:fs/promises';
-import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
 import test from 'node:test';
-import { startedAndShaken, structureOf, type Note } from './helpers/plugin.ts';
+import { makeDirectory, startedAndShaken, structureOf, type Note } from './helpers/plugin.ts';
 
 type Notes = { readonly notes: readonly Note[] };
 
@@ -170,8 +168,7 @@ test('a title that is not text is refused in one sentence that names it', async 
 });
 
 test('a daily.db from before titles moves up, and its Notes come out untitled', async (t) => {
-  const directory = await mkdtemp(join(tmpdir(), 'worklog-v1-'));
-  t.after(() => rm(directory, { recursive: true, force: true }));
+  const directory = await makeDirectory(t);
   const old = new DatabaseSync(join(directory, 'daily.db'));
   old.exec(`
     CREATE TABLE cycles (id INTEGER PRIMARY KEY, started_at TEXT NOT NULL);

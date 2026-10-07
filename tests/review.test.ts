@@ -3,12 +3,11 @@
  * Done, so it moves with a new Cycle, and the Meeting gives it a section.
  */
 import { strict as assert } from 'node:assert';
-import { mkdtemp, rm } from 'node:fs/promises';
-import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
 import test from 'node:test';
 import {
+  makeDirectory,
   startedAndShaken,
   structureOf,
   textOf,
@@ -119,8 +118,7 @@ test('a Status that is not one of the four is refused with a sentence naming the
 });
 
 test('a daily.db from before In Review moves up with every Entry, its place and its Status', async (t) => {
-  const directory = await mkdtemp(join(tmpdir(), 'worklog-v3-'));
-  t.after(() => rm(directory, { recursive: true, force: true }));
+  const directory = await makeDirectory(t);
   const old = new DatabaseSync(join(directory, 'daily.db'));
   old.exec(`
     CREATE TABLE cycles (id INTEGER PRIMARY KEY, started_at TEXT NOT NULL);

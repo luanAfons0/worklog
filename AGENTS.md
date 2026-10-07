@@ -26,7 +26,8 @@ Run every command from the repository root.
 | `node --test`                       | Every test. This is the whole suite.       |
 | `node --test tests/entries.test.ts` | One test file, while you work on it.       |
 | `npm install && npx tsc --noEmit`   | Check the types. `npm run typecheck` is the same. |
-| `./mcp`                             | The Plugin Server, as the Host runs it.    |
+| `node mcp.ts`                       | The Plugin Server, as the Host runs it.    |
+| `./mcp`                             | The same, for a `wsl` Place.               |
 
 `WORKLOG_NODE` names the Node that `mcp` runs, when the Host's `PATH` has none
 new enough. It is the one environment variable.
@@ -48,7 +49,8 @@ new enough. It is the one environment variable.
 ## Project structure
 
 ```
-mcp            the executable the Host runs: find a Node 24, run src/main.ts.
+mcp.ts         the entry point the Host runs with its own Node: run src/main.ts.
+mcp            the sh wrapper for a wsl Place: find a Node 24, run src/main.ts.
 src/           the Plugin Server. Every file is one job.
   main.ts      start-up: open worklog.db, serve the tools.
   store.ts     worklog.db: open it, move it up to the current schema version.

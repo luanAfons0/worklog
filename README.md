@@ -50,9 +50,12 @@ checkbox to tick it. Ctrl+click opens a link. The first Esc leaves the block,
 and the second closes the dialog.
 
 It needs Node 24 or newer, for TypeScript with no build step and for
-`node:sqlite`. The Host's service `PATH` often has only an older Node, so `mcp`
-looks for one in this order: `WORKLOG_NODE`, `node` on `PATH`, then every Node
-under nvm. With none, it says so in one sentence and the Plugin is Stopped.
+`node:sqlite`. The Host starts `mcp.ts` with its own Node, on Windows and on
+Linux alike, so the Plugin needs no Node of its own there. `mcp` is the `sh`
+wrapper for a `wsl` Place, where the Host starts `./mcp`. The Host's service
+`PATH` often has only an older Node, so `mcp` looks for one in this order:
+`WORKLOG_NODE`, `node` on `PATH`, then every Node under nvm. With none, it says
+so in one sentence and the Plugin is Stopped.
 
 ## What it keeps
 
@@ -145,7 +148,8 @@ a small renderer written for this Plugin, so the Page loads nothing from a CDN.
 
 ## Running it
 
-`./mcp` is the Plugin Server, as the Host runs it: MCP over stdio. `npm test`
+`mcp.ts` is the Plugin Server, as the Host runs it with its own Node: MCP over
+stdio. `./mcp` is the same, for a `wsl` Place. `npm test`
 runs every test; `npm run typecheck` checks the types.
 
 ## Licence

@@ -1,7 +1,7 @@
 /**
  * The Plugin Server starts, answers the Host, and says what it can do.
  *
- * Everything here goes through the one seam: the real `mcp` executable against
+ * Everything here goes through the one seam: the real `mcp.ts` against
  * a temporary Plugin directory, spoken to as the Host speaks to it.
  */
 import { strict as assert } from 'node:assert';
