@@ -51,7 +51,8 @@ and the second closes the dialog.
 
 It needs Node 24 or newer, for TypeScript with no build step and for
 `node:sqlite`. The Host starts `mcp.ts` with its own Node, on Windows and on
-Linux alike, so the Plugin needs no Node of its own there. `mcp` is the `sh`
+Linux alike, so the Plugin needs no Node of its own there. If that Node is
+older than 24, the Plugin says so in one sentence and is Stopped. `mcp` is the `sh`
 wrapper for a `wsl` Place, where the Host starts `./mcp`. The Host's service
 `PATH` often has only an older Node, so `mcp` looks for one in this order:
 `WORKLOG_NODE`, `node` on `PATH`, then every Node under nvm. With none, it says

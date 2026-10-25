@@ -52,7 +52,7 @@ new enough. It is the one environment variable.
 mcp.ts         the entry point the Host runs with its own Node: run src/main.ts.
 mcp            the sh wrapper for a wsl Place: find a Node 24, run src/main.ts.
 src/           the Plugin Server. Every file is one job.
-  main.ts      start-up: open worklog.db, serve the tools.
+  main.ts      start-up: check the Node, open worklog.db, serve the tools.
   store.ts     worklog.db: open it, move it up to the current schema version.
   cycles.ts    a Cycle: the current one, the first one started by itself, and
                start_cycle, which moves every Entry that is not Done, and the

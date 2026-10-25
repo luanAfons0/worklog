@@ -29,9 +29,9 @@ is nothing to build, and it ships `node:sqlite`, where Worklog keeps its data
 (ADR-0002). For changes to the Page, a running
 [FirstMate](https://github.com/luanAfons0/FirstMate) too.
 
-Worklog is developed and tested on Linux and on WSL Debian, where FirstMate
-runs. macOS and native Windows are untried rather than unsupported. If you run
-it there, open an issue with what breaks.
+Worklog is developed on Linux and on WSL Debian, and every pull request runs
+its tests on Linux and on native Windows. macOS is untried rather than
+unsupported. If you run it there, open an issue with what breaks.
 
 ## Get the code
 
@@ -51,8 +51,8 @@ npm test            # node --test: every test
 npm run typecheck   # tsc --noEmit
 ```
 
-Both must pass. The `Check` workflow runs both on `ubuntu-latest` for every
-pull request.
+Both must pass. The `Check` workflow runs both on `ubuntu-latest` and on
+`windows-latest` for every pull request.
 
 There are two test seams, and **no test imports a module of `src/`**. That is
 what lets the whole inside of this Plugin be rewritten without touching a
