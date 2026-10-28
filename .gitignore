@@ -1,5 +1,8 @@
 node_modules/
 
+# The Plugin Release, written by `npm run release`.
+release/
+
 # An agent's worktrees.
 .claude/
 
