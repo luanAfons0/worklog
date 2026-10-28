@@ -1,0 +1,3 @@
+# Worklog ships a Plugin Release
+
+`firstmate install worklog` fetches a Plugin Release, a published archive made from a tag, and not a clone of the source (FirstMate ADR-0033). The repository still runs from source with no build step; only the Plugin Release is built, by `npm run release`: `tsdown` bundles `mcp.ts` into one `release/mcp.js`, not minified, and `web/` and an `mcp` wrapper are copied beside it. It holds no `mcp.ts` and no `src/`, because the Host starts `mcp.ts` before `mcp.js` (FirstMate ADR-0028), and no `worklog.db`, so `update` never touches the data. A tag `vMAJOR.MINOR.PATCH` runs `.github/workflows/release.yml`, which calls FirstMate's `plugin-release.yml`.

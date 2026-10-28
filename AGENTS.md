@@ -28,6 +28,7 @@ Run every command from the repository root.
 | `npm install && npx tsc --noEmit`   | Check the types. `npm run typecheck` is the same. |
 | `node mcp.ts`                       | The Plugin Server, as the Host runs it.    |
 | `./mcp`                             | The same, for a `wsl` Place.               |
+| `npm run release`                   | Build the Plugin Release into `release/`.  |
 
 `WORKLOG_NODE` names the Node that `mcp` runs, when the Host's `PATH` has none
 new enough. It is the one environment variable.
@@ -36,8 +37,10 @@ new enough. It is the one environment variable.
 
 ## Tech stack
 
-- **Node 24**, which runs TypeScript with no build step and ships
-  `node:sqlite`. No bundler, no transpiler, no watcher.
+- **Node 24**, which runs TypeScript and ships `node:sqlite`. The repository
+  has no build step; the Plugin Release is built (ADR-0003). `tsdown`, a dev
+  dependency, bundles `mcp.ts` into `release/mcp.js` and nothing else uses it.
+  No transpiler, no watcher.
 - **TypeScript 5.8**, `strict`, `noUncheckedIndexedAccess`,
   `erasableSyntaxOnly`. `typescript` is a dev dependency, used only to check
   the types.
@@ -62,6 +65,7 @@ src/           the Plugin Server. Every file is one job.
   notes.ts     a Note: keep, change and delete it. It has no Status and no Cycle.
   tools.ts     the tools this Plugin ships, for the Page and other Plugins.
   mcp.ts       the one connection to the Host: MCP over stdio.
+scripts/       build-release.ts: the Plugin Release build (`npm run release`).
 web/           the Plugin Page and the Popup form, as the Host serves them.
   index.html   the Plugin Page, drawn by app.js.
   new.html     the Popup form a FirstMate Shortcut opens, driven by new.js.

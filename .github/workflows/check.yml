@@ -1,6 +1,6 @@
 # The two commands AGENTS.md already names, run by a machine on every change.
 #
-# There is no build step, because Node 24 runs the TypeScript directly and
+# The repository has no build step, because Node 24 runs the TypeScript directly and
 # ships node:sqlite (ADR-0002). Every test spawns the real Plugin Server
 # against a temporary Plugin directory, or reads web/ off disk, so nothing here
 # needs a Host, a Registry or a running FirstMate.
